@@ -6,7 +6,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement>{
   colunms: string
   value: string;
   id: string;
-  place: string
+  place?: string
 }
 
 export const Input:  React.FC<InputProps> = ({
@@ -22,11 +22,13 @@ export const Input:  React.FC<InputProps> = ({
               value={props.value} 
               onChange={e => {
                 if(props.onValueChange && props.id=="inputPreco")
-                  {props.onValueChange(e.target.value.replace(/\D/g, ''))}
+                  {props.onValueChange(e.target.value.replace(/[^0-9.]/g, ''))}
                 else if(props.onValueChange)
                   {props.onValueChange(e.target.value)}
               }}
-              placeholder={`digite o ${props.place} do produto`}/>
+              placeholder={
+                props.place ?
+                `digite o ${props.place} do produto` : undefined}/>
       </div>
     </div>
   )

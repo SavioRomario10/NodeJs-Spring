@@ -2,23 +2,41 @@
 
 import { useState } from "react"
 import { Layout, Input, TextArea} from "@/components"
+import { useProdutoService } from "@/app/api/services"
+import { Produto } from "@/app/api/models/produtos";
 
 export const CadastroProdutos: React.FC = () => {
 
+  const service = useProdutoService()
   const [sku, setSku] = useState<string>('')
   const [preco, setPreco] = useState<string>('')
   const [nome, setNome] = useState<string>('')
   const [descricao, setDesc] = useState<string>('')
+  const [id, setId] = useState<string>('')
+  const [cadastro, setCadastro] = useState<string>('')
 
   const submit = () => {
-    const produto = {
+    const produto: Produto = {
+      id,
       sku,
-      preco,
+      preco: parseFloat(preco),
       nome,
       descricao
     }
-    console.log(produto)
-    clear()
+
+    if(id){
+      service
+        .atualizar(produto)
+        .then(response => console.log("atualizado!"))
+    }
+    else{   
+      service
+        .salvar(produto)
+        .then(produtoResposta => {
+          setId(produtoResposta.id || '')
+          setCadastro(produtoResposta.cadastro || '')
+        })
+    }
   }
 
   const clear = () => {
@@ -26,10 +44,18 @@ export const CadastroProdutos: React.FC = () => {
     setPreco('')
     setNome('')
     setDesc('')
+
+    setId('')
   }
 
   return(
     <Layout titulo="Cadastro de Produtos">
+      {id &&
+        <div className="columns">
+          <Input label="Códido: *" colunms="is-half" value={id} id="inputId" disabled/>
+          <Input label="Data cadastro: *" colunms="is-half" value={cadastro} id="inputCadastro" disabled={true}/>
+        </div>
+      }
       <div className="columns">
         <Input label="SKU: *" colunms="is-half" value={sku} id="inputSku" onValueChange={setSku} place="SKU" />
         <Input label="Preço: *" colunms="is-half" value={preco} id="inputPreco" onValueChange={setPreco} place="Preço" />
@@ -43,7 +69,9 @@ export const CadastroProdutos: React.FC = () => {
 
       <div className="field is-grouped">
         <div className="control">
-          <button className="button is-link" onClick={submit}>Salvar</button>
+          <button className="button is-link" onClick={submit}>
+            {id ? "Atualizar":"Salvar"}
+          </button>
         </div>
         <div className="control">
           <button className="button is-link is-light" onClick={clear}>Limpar</button>

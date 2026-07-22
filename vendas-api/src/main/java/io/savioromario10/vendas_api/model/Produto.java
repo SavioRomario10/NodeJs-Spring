@@ -1,12 +1,14 @@
 package io.savioromario10.vendas_api.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,11 +25,34 @@ public class Produto {
   @Column(name = "descricao")
   private String descricao;
 
-  @Column(name = "preco", precision = 2, scale = 16)
+  @Column(name = "preco", precision = 16, scale = 2)
   private BigDecimal preco;
 
   @Column(name = "sku")
   private String sku;
+
+  @Column(name = "data_cadastro")
+  private LocalDate dataCadastro;
+
+  public Produto(){}
+  public Produto(String nome, String descricao, BigDecimal preco, String sku){
+    this.nome = nome;
+    this.descricao = descricao;
+    this.preco = preco;
+    this.sku = sku;
+  }
+  public Produto(Long id, String nome, String descricao, BigDecimal preco, String sku) {
+    this.id = id;
+    this.nome = nome;
+    this.descricao = descricao;
+    this.preco = preco;
+    this.sku = sku;
+  }
+
+  @PrePersist
+  public void prePersiste(){
+    setDataCadastro(LocalDate.now());
+  }
 
   public Long getId() {
     return id;
@@ -58,6 +83,12 @@ public class Produto {
   }
   public void setSku(String sku) {
     this.sku = sku;
+  }
+  public LocalDate getDataCadastro() {
+    return dataCadastro;
+  }
+  public void setDataCadastro(LocalDate dataCadastro) {
+    this.dataCadastro = dataCadastro;
   }
   
   @Override
