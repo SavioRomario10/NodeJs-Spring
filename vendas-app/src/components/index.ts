@@ -1,4 +1,3 @@
 export { Layout } from './layout'
-export { CadastroProdutos } from './produtos'
-export { Input } from './common'
-export { TextArea } from './common'
+export { CadastroProdutos, ListagemProdutos } from './produtos'
+export { Input, TextArea, Message, Loader} from './common'

@@ -1,6 +1,8 @@
 package io.savioromario10.vendas_api.model.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,5 +42,13 @@ public class ProdutoService {
     }
     
     return HttpStatus.NOT_FOUND;
+  }
+
+  public List<ProdutoFormRequest> listarTodos(){
+    List<Produto> produtos = produtoRepository.findAll();
+    
+    List<ProdutoFormRequest> produtosEncontrados = produtos.stream().map(ProdutoFormRequest::fromModel).collect(Collectors.toList());
+
+    return produtosEncontrados;
   }
 }

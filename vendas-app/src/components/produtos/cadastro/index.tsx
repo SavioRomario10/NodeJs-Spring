@@ -1,12 +1,36 @@
 "use client";
 
 import { useState } from "react"
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Layout, Input, TextArea} from "@/components"
 import { useProdutoService } from "@/app/api/services"
 import { Produto } from "@/app/api/models/produtos";
+import { converterEmBigDecimal } from "@/app/api/util/money";
+import { Message } from "@/components";
+import { Alert } from "@/components/common/message";
+import * as yup from "yup"
+
+const msgCampo = "Campo obrigatório"
+const msgMore = "Valor deve ser maior que zero(0,00)"
+
+const validationSchema = yup.object().shape({
+  sku: yup.string().trim().required(msgCampo),
+  nome: yup.string().trim().required(msgCampo),
+  descricao: yup.string().trim().required(msgCampo),
+  preco: yup.number().required(msgCampo).moreThan(0, msgMore)
+})
+
+interface FormErros{
+  sku?: string;
+  nome?: string;
+  preco?: string;
+  descricao?: string;
+}
 
 export const CadastroProdutos: React.FC = () => {
 
+  const router = useRouter()
   const service = useProdutoService()
   const [sku, setSku] = useState<string>('')
   const [preco, setPreco] = useState<string>('')
@@ -14,29 +38,50 @@ export const CadastroProdutos: React.FC = () => {
   const [descricao, setDesc] = useState<string>('')
   const [id, setId] = useState<string>('')
   const [cadastro, setCadastro] = useState<string>('')
+  const [messages, setMessages] = useState<Array<Alert>>([])
+  const [errors, setErros] = useState<FormErros>({})
 
   const submit = () => {
+
     const produto: Produto = {
       id,
       sku,
-      preco: parseFloat(preco),
+      preco: converterEmBigDecimal(preco),
       nome,
       descricao
     }
 
-    if(id){
-      service
-        .atualizar(produto)
-        .then(response => console.log("atualizado!"))
-    }
-    else{   
-      service
-        .salvar(produto)
-        .then(produtoResposta => {
-          setId(produtoResposta.id || '')
-          setCadastro(produtoResposta.cadastro || '')
-        })
-    }
+    validationSchema.validate(produto).then(obj => {
+
+      setErros({})
+
+      if(id){
+        service
+          .atualizar(produto)
+          .then(response => setMessages([{
+            tipo:"success", texto:"Produto atualizado com sucesso"
+          }]))
+      }
+      else{   
+        service
+          .salvar(produto)
+          .then(produtoResposta => {
+            setId(produtoResposta.id || '')
+            setCadastro(produtoResposta.cadastro || '')
+            setMessages([{
+              tipo:"success", texto:"Produto salvo com sucesso"
+            }])
+          })
+      }
+    }).catch(err =>{
+      const field = err.path;
+      const message = err.message;
+
+      setErros({
+        [field]: message
+      })
+
+    })
   }
 
   const clear = () => {
@@ -46,10 +91,11 @@ export const CadastroProdutos: React.FC = () => {
     setDesc('')
 
     setId('')
+    setMessages([])
   }
 
   return(
-    <Layout titulo="Cadastro de Produtos">
+    <Layout titulo="Cadastro de Produtos" mensagens={messages}>
       {id &&
         <div className="columns">
           <Input label="Códido: *" colunms="is-half" value={id} id="inputId" disabled/>
@@ -57,14 +103,14 @@ export const CadastroProdutos: React.FC = () => {
         </div>
       }
       <div className="columns">
-        <Input label="SKU: *" colunms="is-half" value={sku} id="inputSku" onValueChange={setSku} place="SKU" />
-        <Input label="Preço: *" colunms="is-half" value={preco} id="inputPreco" onValueChange={setPreco} place="Preço" />
+        <Input label="SKU: *" colunms="is-half" value={sku} id="inputSku" onValueChange={setSku} place="SKU" error={errors.sku}/>
+        <Input label="Preço: *" colunms="is-half" value={preco} id="inputPreco" onValueChange={setPreco} place="Preço" maxLength={16} error={errors.preco} currency/>
       </div>
       <div className="columns">
-        <Input label="Nome: *" colunms="is-full" value={nome} id="inputNome" onValueChange={setNome} place="Nome" />
+        <Input label="Nome: *" colunms="is-full" value={nome} id="inputNome" onValueChange={setNome} error={errors.nome} place="Nome" />
       </div>
       <div className="columns">
-        <TextArea label="Descrição: *" colunms="is-full" value={descricao} id="inputDesc" onValueChange={setDesc} place="Descrição" />
+        <TextArea label="Descrição: *" colunms="is-full" value={descricao} id="inputDesc" onValueChange={setDesc} place="Descrição" error={errors.descricao}/>
       </div>
 
       <div className="field is-grouped">
@@ -77,7 +123,9 @@ export const CadastroProdutos: React.FC = () => {
           <button className="button is-link is-light" onClick={clear}>Limpar</button>
         </div>
         <div className="control">
-          <button className="button is-link is-light">Voltar</button>
+          <Link href="/consultas/produtos">
+            <button className="button is-link is-light">Voltar</button>
+          </Link>
         </div>
       </div>
     </Layout>

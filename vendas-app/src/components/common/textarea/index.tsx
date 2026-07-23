@@ -6,7 +6,8 @@ interface TextAreaProps extends InputHTMLAttributes<HTMLInputElement>{
   colunms: string
   value: string;
   id: string;
-  place: string
+  place: string;
+  error?: string;
 }
 
 export const TextArea: React.FC<TextAreaProps> = ({
@@ -23,6 +24,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
               onChange={e => {
                 if(props.onValueChange){props.onValueChange(e.target.value)}}}
               placeholder={`digite o ${props.place} do produto`}/>
+        {props.error &&
+          <p className="help is-danger">{props.error}</p>
+        }
       </div>
     </div>
   )

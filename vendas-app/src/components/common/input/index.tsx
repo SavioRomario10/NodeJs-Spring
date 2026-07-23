@@ -1,4 +1,5 @@
 import { InputHTMLAttributes } from 'react'
+import { formatReal } from '@/app/api/util/money'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement>{
   onValueChange?: (value: string) => void;
@@ -7,6 +8,8 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement>{
   value: string;
   id: string;
   place?: string
+  currency?: boolean;
+  error?: string;
 }
 
 export const Input:  React.FC<InputProps> = ({
@@ -21,14 +24,19 @@ export const Input:  React.FC<InputProps> = ({
               id={props.id} 
               value={props.value} 
               onChange={e => {
-                if(props.onValueChange && props.id=="inputPreco")
-                  {props.onValueChange(e.target.value.replace(/[^0-9.]/g, ''))}
-                else if(props.onValueChange)
-                  {props.onValueChange(e.target.value)}
-              }}
+                  let value = e.target.value;
+                  if(value && props.currency){
+                    value = formatReal(value) ?? '';
+                  }
+                  if (props.onValueChange){
+                    props.onValueChange(value)}
+                }}
               placeholder={
                 props.place ?
                 `digite o ${props.place} do produto` : undefined}/>
+          {props.error &&
+            <p className="help is-danger">{props.error}</p>
+          }
       </div>
     </div>
   )

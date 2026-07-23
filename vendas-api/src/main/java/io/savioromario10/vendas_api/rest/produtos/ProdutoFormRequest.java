@@ -10,8 +10,8 @@ import io.savioromario10.vendas_api.model.Produto;
 public class ProdutoFormRequest {
 
   private Long id;
-  private String descricao;
   private String nome;
+  private String descricao;
   private BigDecimal preco;
   private String sku;
 
@@ -20,11 +20,11 @@ public class ProdutoFormRequest {
 
   public ProdutoFormRequest() {}
   public ProdutoFormRequest(
-    Long id, String descricao, String nome, BigDecimal preco, String sku, LocalDate cadastro) {
+    Long id, String nome, String descricao, BigDecimal preco, String sku, LocalDate cadastro) {
 
     this.id = id;
-    this.descricao = descricao;
     this.nome = nome;
+    this.descricao = descricao;
     this.preco = preco;
     this.sku = sku;
     this.cadastro = cadastro;
