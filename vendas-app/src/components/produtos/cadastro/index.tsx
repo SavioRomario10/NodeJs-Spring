@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Layout, Input, TextArea} from "@/components"
 import { useProdutoService } from "@/app/api/services"
 import { Produto } from "@/app/api/models/produtos";
-import { converterEmBigDecimal } from "@/app/api/util/money";
+import { converterEmBigDecimal, formatReal } from "@/app/api/util/money";
 import { Message } from "@/components";
 import { Alert } from "@/components/common/message";
 import * as yup from "yup"
@@ -30,7 +30,6 @@ interface FormErros{
 
 export const CadastroProdutos: React.FC = () => {
 
-  const router = useRouter()
   const service = useProdutoService()
   const [sku, setSku] = useState<string>('')
   const [preco, setPreco] = useState<string>('')
@@ -40,7 +39,24 @@ export const CadastroProdutos: React.FC = () => {
   const [cadastro, setCadastro] = useState<string>('')
   const [messages, setMessages] = useState<Array<Alert>>([])
   const [errors, setErros] = useState<FormErros>({})
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
+  const queryId = searchParams.get("id");
+  
+  useEffect(() => {
+    if(queryId){
+      service.carregarProduto(queryId ?? '').then(produto =>{
+        setId(produto.id ?? '')
+        setSku(produto.sku ?? '')
+        setNome(produto.nome ?? '')
+        setDesc(produto.descricao ?? '')
+        setCadastro(produto.cadastro ?? '')
+        setPreco(formatReal(`${produto.preco}`) ?? '')
+      })
+    }
+  }, [queryId])
+  
   const submit = () => {
 
     const produto: Produto = {

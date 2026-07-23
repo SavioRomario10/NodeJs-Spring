@@ -51,4 +51,24 @@ public class ProdutoService {
 
     return produtosEncontrados;
   }
+
+  public Optional<Produto> buscarPorId(Long id){
+
+    Optional<Produto> produtoOptional = produtoRepository.findById(id);
+
+    return produtoOptional;
+  }
+
+  public HttpStatus deletar(Long id){
+    
+    Optional<Produto> produtoOptional = produtoRepository.findById(id);
+
+    if(produtoOptional.isEmpty()){
+      return HttpStatus.NOT_FOUND;
+    }
+    
+    produtoRepository.deleteById(id);
+
+    return HttpStatus.NO_CONTENT;
+  } 
 }
