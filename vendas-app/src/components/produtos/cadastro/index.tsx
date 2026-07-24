@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Layout, Input, TextArea} from "@/components"
+import { Layout, Input, TextArea, InputMoney} from "@/components"
 import { useProdutoService } from "@/app/api/services"
 import { Produto } from "@/app/api/models/produtos";
 import { converterEmBigDecimal, formatReal } from "@/app/api/util/money";
@@ -119,11 +119,11 @@ export const CadastroProdutos: React.FC = () => {
         </div>
       }
       <div className="columns">
-        <Input label="SKU: *" colunms="is-half" value={sku} id="inputSku" onValueChange={setSku} place="SKU" error={errors.sku}/>
-        <Input label="Preço: *" colunms="is-half" value={preco} id="inputPreco" onValueChange={setPreco} place="Preço" maxLength={16} error={errors.preco} currency/>
+        <Input label="SKU: *" colunms="is-half" value={sku} id="inputSku" onChange={e => e.target.value} place="SKU" error={errors.sku}/>
+        <InputMoney label="Preço: *" colunms="is-half" value={preco} id="inputPreco" onChange={e => e.target.value} maxLength={16} error={errors.preco}/>
       </div>
       <div className="columns">
-        <Input label="Nome: *" colunms="is-full" value={nome} id="inputNome" onValueChange={setNome} error={errors.nome} place="Nome" />
+        <Input label="Nome: *" colunms="is-full" value={nome} id="inputNome" onChange={e => e.target.value} error={errors.nome} place="Nome" />
       </div>
       <div className="columns">
         <TextArea label="Descrição: *" colunms="is-full" value={descricao} id="inputDesc" onValueChange={setDesc} place="Descrição" error={errors.descricao}/>
