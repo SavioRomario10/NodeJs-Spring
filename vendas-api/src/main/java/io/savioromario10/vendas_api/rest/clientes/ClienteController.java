@@ -1,7 +1,7 @@
 package io.savioromario10.vendas_api.rest.clientes;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.savioromario10.vendas_api.model.service.ClienteService;
@@ -69,7 +70,11 @@ public class ClienteController {
   }
 
   @GetMapping
-  public List<ClienteFormRequest> listarTodos(){
-    return clienteService.listarTodos();
+  public Page<ClienteFormRequest> listarTodos(
+    @RequestParam("nome") String nome,
+    @RequestParam("cpf") String cpf,
+    Pageable pageable
+  ){
+    return clienteService.listarTodos(nome, cpf, pageable);
   }
 }

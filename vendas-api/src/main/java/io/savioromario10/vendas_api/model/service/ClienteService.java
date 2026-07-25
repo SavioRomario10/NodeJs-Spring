@@ -3,6 +3,8 @@ package io.savioromario10.vendas_api.model.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -56,11 +58,10 @@ public class ClienteService {
     );
   }
 
-  public List<ClienteFormRequest> listarTodos() {
+  public Page<ClienteFormRequest> listarTodos(String nome, String cpf, Pageable pageable) {
     return 
       clienteRepository
-        .findAll()
-          .stream().map(ClienteFormRequest::fromModel)
-            .toList();
+        .findByNomeCpf("%" + nome.toUpperCase() + "%","%" + cpf + "%", pageable)
+          .map(ClienteFormRequest::fromModel);
   }
 }
